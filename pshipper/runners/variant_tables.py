@@ -35,8 +35,9 @@ def sync_variants_to_wiki(
     for ship_name in bar:
         ship_data = ships.get(ship_name, None)
 
-        if not ship_data:
-            logger.warning(f"Skipping '{ship_name}': Data not found in game files.")
+        if ship_data is None:
+            logger.warning(f"Could not find ship '{ship_name}'.")
+            bar.set_description(f"Could not find ship '{ship_name}'.")
             continue
 
         bar.set_description(f"Updating '{ship_name}'...")
