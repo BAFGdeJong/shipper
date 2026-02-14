@@ -1,13 +1,14 @@
 {| class="wikitable sortable mw-collapsible{% if collapse == true %} mw-collapsed{% endif %}" style="width:70%;"
 |-
-! colspan="7" | Variants
+! colspan="8" | Variants
 |-
-! Id
+! ID
 ! Name
 ! Capacitors
 ! Vents
 ! Hullmods
-! Weapons & Fighters
+! Armaments
+! Goal variant
 ! Notes
 {% for variant in variants %}
 |-
@@ -23,5 +24,6 @@
 {%- for weapon_name, count in variant.consolidated_weapons.items() %}
 * {{ count }}x [[{{ weapon_name }}]]
 {%- endfor %}
+| {{ variant.goal_variant }}
 | {{ variant.notes }} {% endfor %}
 |}

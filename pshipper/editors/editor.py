@@ -9,6 +9,18 @@ class Editor:
         client = WikiClient('https://starsector.wiki.gg', credentials=credentials)
         self.client = client
 
+    def get_page_text(self, page_name) -> str:
+        if not page_name:
+            return ""
+
+        page = self.client.client.pages[page_name]
+
+        if not page.exists:
+            print(f"Skipping {page_name}: Page does not exist.")
+            return ""
+
+        return page.text()
+
     def add_ship_variants(self, ship, notes, template, collapse_whitelist: list, collapse_after_amount: int):
         page_name = ship.get('name', False)
 

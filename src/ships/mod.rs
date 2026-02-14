@@ -4,13 +4,15 @@ use std::fs::File;
 use serde::Serialize;
 use crate::io::LoadPlan;
 use crate::ships::ship::Ship;
+use crate::ships::ship_data::ShipData;
 use crate::ships::variant::Variant;
 
 pub mod ship;
 pub mod variant;
 pub mod weapon;
 pub mod weapon_group;
-mod wing;
+pub mod wing;
+pub mod ship_data;
 
 #[derive(Serialize)]
 pub struct Data {
@@ -41,11 +43,11 @@ impl Data {
     }
 
     fn map(&mut self, key_type: &str) {
-        // let ship_data_csv = Self::load_csv(&format!("{}ship_data.csv", &self.hulls_folder)).unwrap_or_default();
+        let ship_data = ShipData::load_as_map(&format!("{}ship_data.csv", &self.hulls_folder), "id");
         let weapons_data_csv = Self::load_csv(&format!("{}weapon_data.csv", &self.weapons_folder)).unwrap_or_default();
         let hull_mods_csv = Self::load_csv(&format!("{}hull_mods.csv", &self.hull_mods_folder)).unwrap_or_default();
 
-        let mut ships = Ship::load_folder(&self.hulls_folder, &["ship", "skin"], &());
+        let mut ships = Ship::load_folder(&self.hulls_folder, &["ship", "skin"], &ship_data.unwrap());
         let mut variants = Variant::load_folder(&self.variants_folder, &["variant"], &(&hull_mods_csv, &weapons_data_csv));
 
         let mut hull_to_name: HashMap<String, String> = HashMap::new();
@@ -64,7 +66,12 @@ impl Data {
             if !variant.wings.is_empty() {
                 for wing in &mut variant.wings {
                     if let Some(name) = hull_to_name.get(&wing.hull_id) {
-                        wing.name = name.clone();
+                        let mut n = name.clone();
+                        if n == "Hoplon" { // TODO Hardcode fix, I don't know where it converts hoplon_wing into Khopesh
+                            n = "Khopesh".to_string();
+                        }
+
+                        wing.name = n;
                     }
 
                     if let Some(dn) = hull_to_variant_dn.get(&wing.hull_id) {
@@ -84,6 +91,8 @@ impl Data {
                 ships[index].add_variant(variant);
             }
         }
+
+
 
         match key_type {
             "name" => {
@@ -113,7 +122,6 @@ impl Data {
 
         Ok(map)
     }
-
 
 }
 

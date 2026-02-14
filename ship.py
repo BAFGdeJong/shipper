@@ -4,6 +4,7 @@ import shipper
 from dotenv import load_dotenv
 
 from pshipper.editors.editor import Editor
+from pshipper.runners.get_wiki_ship_data import get_wiki_ship_data
 from pshipper.runners.variant_tables import sync_variants_to_wiki
 from pshipper.utils import load_variant_whitelist, load_variant_notes, load_template, fix_d_variants
 from pshipper.formatter import create_ship_variant_table
@@ -16,6 +17,9 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--data", default="", help="Set starsector data directory", required=True)
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    check_parser = subparsers.add_parser("check", help="Check if wiki page needs to be updated")
+    check_parser.add_argument("-s", "--ships", default="", help="Ships tables to create", required=True)
 
     create_parser = subparsers.add_parser("create", help="Create ...")
     create_parser.add_argument("-s", "--ships", default="", help="Ships tables to create", required=True)
@@ -39,8 +43,30 @@ if __name__ == "__main__":
     if not args.data.endswith("/") and not args.data.endswith("\\"):
         args.data += "/"
 
+    if args.command == "check":
+        ships = shipper.get_ships(args.data, "name")
+
+        fix_d_variants(ships)
+
+        ship_names = [s.strip() for s in args.ships.split(",") if s.strip() != '']
+        r_ships = []
+        for ship_name in ship_names:
+            r_ships.append(ships.get(ship_name))
+
+        load_dotenv()
+        username = os.getenv("WIKI_USERNAME")
+        password = os.getenv("WIKI_PASSWORD")
+
+        if not username or not password:
+            print("Error: WIKI_USERNAME or WIKI_PASSWORD not found in .env")
+            exit(1)
+
+        for ship in r_ships:
+            get_wiki_ship_data(Editor(username, password), ship)
+
     if args.command == "create":
         ships = shipper.get_ships(args.data, "name")
+
         fix_d_variants(ships)
 
         ship_names = [s.strip() for s in args.ships.split(",") if s.strip() != '']
@@ -51,6 +77,7 @@ if __name__ == "__main__":
         results = []
 
         for ship in r_ships:
+            print(ship)
             result = create_ship_variant_table(
                 ship,
                 load_variant_notes(args.notes),

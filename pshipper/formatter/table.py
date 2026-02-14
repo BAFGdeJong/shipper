@@ -23,6 +23,9 @@ def __preprocess_data(ship_data, notes):
         raw_mods = variant.get('hull_mods', [])
         variant['hull_mods'] = [m for m in raw_mods]
 
+        goal_variant = variant.get('goal_variant', False)
+        variant['goal_variant'] = "Yes" if goal_variant else "No"
+
         note = variant.get('notes', '')
         variant['notes'] = note
 

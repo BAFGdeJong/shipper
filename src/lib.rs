@@ -13,11 +13,10 @@ fn get_ships(py: Python, starsector_data_folder: String, key_by: String) -> PyRe
 
     let ship_data = ships::Data::new(&starsector_data_folder, &key_by).ships;
 
-    let python_dict = pythonize(py, &ship_data)
+    let python_dict_bound = pythonize(py, &ship_data)
         .map_err(|e| PyValueError::new_err(e.to_string()))?;
 
-    Ok(Py::from(python_dict))
-    
+    Ok(python_dict_bound.unbind())
 }
 
 #[pymodule]
