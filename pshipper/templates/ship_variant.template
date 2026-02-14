@@ -2,6 +2,7 @@
 |-
 ! colspan="6" | Variants
 |-
+! Id
 ! Name
 ! Capacitors
 ! Vents
@@ -10,6 +11,7 @@
 ! Notes
 {% for variant in variants %}
 |-
+| {{ variant.variant_id }}
 | {{ variant.display_name }}
 | {{ '{{' }}TextColor|{{ variant.flux_capacitors }}{{ '}}' }}
 | {{ '{{' }}TextColor|{{ variant.flux_vents }}{{ '}}' }}
@@ -21,6 +23,5 @@
 {%- for weapon_name, count in variant.consolidated_weapons.items() %}
 * {{ count }}x [[{{ weapon_name }}]]
 {%- endfor %}
-| {{ variant.note }}
-{% endfor %}
+| {{ variant.note }} {% endfor %}
 |}

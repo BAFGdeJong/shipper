@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from jinja2 import FileSystemLoader, Environment
+from jinja2 import FileSystemLoader, Environment, Template
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,7 +22,7 @@ def load_variant_notes(name: str) -> dict:
         print(f"Warning: Notes not found at {path}")
         return {}
 
-def load_template(name: str):
+def load_template(name: str) -> Template:
     template_dir = BASE_DIR / "templates"
 
     file_loader = FileSystemLoader(str(template_dir))

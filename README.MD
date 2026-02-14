@@ -36,6 +36,7 @@ args <br>
 --whitelist {whitelist.json in pshipper/data/variant} <br>
 --notes {notes.json in pshipper/data/variant} <br>
 --template {template.template in pshipper/templates} <br>
+--collapse_after_amount {number} <br>
 
 ---
 

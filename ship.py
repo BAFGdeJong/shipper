@@ -1,7 +1,13 @@
-import shipper
+import os
 
+import shipper
+from dotenv import load_dotenv
+
+from pshipper.editors.editor import Editor
 from pshipper.runners import update_variant_tables
-from pshipper.utils import load_variant_whitelist, load_variant_notes, load_template, VariantTabler
+from pshipper.runners.update_variant_tables import sync_variants_to_wiki
+from pshipper.utils import load_variant_whitelist, load_variant_notes, load_template
+from pshipper.formatter import create_ship_variant_table
 
 import argparse
 
@@ -16,13 +22,15 @@ if __name__ == "__main__":
     create_parser.add_argument("-p", "--ship", help="Path to the whitelist JSON", required=True)
     create_parser.add_argument("-n", "--notes", default="notes.json", help="Path to the notes JSON")
     create_parser.add_argument("-t", "--template", default="ship_variant.template", help="Path to the template file")
+    create_parser.add_argument("-o", "--collapse_whitelist", default="collapse_whitelist.json", help="Path to the whitelist JSON")
     create_parser.add_argument("-c", "--collapse_after_amount", default=3, type=int, help="After what amount of variants to collapse")
     create_parser.add_argument("-w", "--write_to_file", default="", help="Write table to disk") # TODO
 
-    update_parser = subparsers.add_parser("update", help="Update ...")
-    update_parser.add_argument("-w", "--whitelist", default="whitelist.json", help="Filename in data/variant/")
-    update_parser.add_argument("-n", "--notes", default="notes.json", help="Filename in data/variant/")
-    update_parser.add_argument("-t", "--template", default="ship_variant.template", help="Filename in templates/")
+    sync_parser = subparsers.add_parser("sync", help="Sync ...")
+    sync_parser.add_argument("-w", "--whitelist", default="whitelist.json", help="Filename in data/variant/")
+    sync_parser.add_argument("-n", "--notes", default="notes.json", help="Filename in data/variant/")
+    sync_parser.add_argument("-t", "--template", default="ship_variant.template", help="Filename in templates/")
+    sync_parser.add_argument("-c", "--collapse_after_amount", default=3, type=int, help="After what amount of variants to collapse")
 
     args = parser.parse_args()
 
@@ -35,10 +43,11 @@ if __name__ == "__main__":
         if ship is None:
             print("Ship does not exist or could not be found")
         else:
-            result = VariantTabler.render_ship_table(
+            result = create_ship_variant_table(
                 ship,
                 load_variant_notes(args.notes),
                 load_template(args.template),
+                load_variant_whitelist(args.collapse_whitelist),
                 args.collapse_after_amount
             )
 
@@ -48,10 +57,21 @@ if __name__ == "__main__":
 
             print(result)
 
-    if args.command == "update":
-        update_variant_tables(
-            args.data,
-            load_variant_whitelist(args.whitelist),
-            load_variant_notes(args.notes),
-            load_template(args.template)
+    if args.command == "sync":
+        load_dotenv()
+        username = os.getenv("WIKI_USERNAME")
+        password = os.getenv("WIKI_PASSWORD")
+
+        if not username or not password:
+            print("Error: WIKI_USERNAME or WIKI_PASSWORD not found in .env")
+            exit(1)
+
+        sync_variants_to_wiki(
+            editor=Editor(username, password),
+            starsector_data_folder=args.data,
+            ship_whitelist=load_variant_whitelist(args.whitelist),
+            notes=load_variant_notes(args.notes),
+            template=load_template(args.template),
+            collapse_limit=args.collapse_after_amount,
+            rate_limit_delay=2.5
         )
