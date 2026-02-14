@@ -1,0 +1,26 @@
+{| class="wikitable sortable mw-collapsible{% if collapse == true %} mw-collapsed{% endif %}" style="width:70%;"
+|-
+! colspan="6" | Variants
+|-
+! Name
+! Capacitors
+! Vents
+! Hullmods
+! Weapons & Fighters
+! Notes
+{% for variant in variants %}
+|-
+| {{ variant.display_name }}
+| {{ '{{' }}TextColor|{{ variant.flux_capacitors }}{{ '}}' }}
+| {{ '{{' }}TextColor|{{ variant.flux_vents }}{{ '}}' }}
+|
+{%- for mod in variant.hull_mods %}
+* [[{{ mod }}]]
+{%- endfor %}
+|
+{%- for weapon_name, count in variant.consolidated_weapons.items() %}
+* {{ count }}x [[{{ weapon_name }}]]
+{%- endfor %}
+| {{ variant.note }}
+{% endfor %}
+|}

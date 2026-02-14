@@ -1,0 +1,19 @@
+{
+
+  "Eagle": [
+    {
+      "variant": "Support",
+      "constraints": { "variantId": "eagle_Support" },
+      "note": "The only variant available to the [[Persean League]]."
+    }
+  ],
+
+  "Condor": [
+    {
+      "variant": "Support",
+      "constraints": { "variantId": "condor_Support" },
+      "note": "Variant of the Condor that the player may start the game with."
+    }
+  ]
+
+}

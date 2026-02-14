@@ -1,0 +1,1 @@
+from .update_variant_tables import update_variant_tables
