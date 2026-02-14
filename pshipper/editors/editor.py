@@ -109,6 +109,9 @@ class Editor:
                 new_table = create_ship_variant_table(ship, notes, template, collapse_whitelist, collapse_after_amount)
                 new_text = pattern.sub(f"\\1\n{new_table}\n", current_text)
 
+                if new_text == current_text:
+                    return f"No changes were made to {page_name}, table was up to date."
+
                 page.save(new_text, summary=f"Updated variants")
                 return f"Updated {page_name}"
             return f"No existing content on page {page_name} was found."
