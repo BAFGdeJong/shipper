@@ -43,7 +43,7 @@ if __name__ == "__main__":
         ships = shipper.get_ships(args.data, "name")
         fix_d_variants(ships)
 
-        ship_names = [s.strip() for s in args.ships.split(",")]
+        ship_names = [s.strip() for s in args.ships.split(",") if s.strip() != '']
         r_ships = []
         for ship_name in ship_names:
             r_ships.append(ships.get(ship_name))
@@ -78,7 +78,7 @@ if __name__ == "__main__":
             print("Error: WIKI_USERNAME or WIKI_PASSWORD not found in .env")
             exit(1)
 
-        update_ships = [s.strip() for s in args.ships.split(",")]
+        update_ships = [s.strip() for s in args.ships.split(",") if s.strip() != '']
 
         sync_variants_to_wiki(
             editor=Editor(username, password),
