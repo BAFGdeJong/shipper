@@ -9,11 +9,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct ShipData {
-    // #[serde(alias = "name")]
-    // pub name: Option<String>,
+    #[serde(alias = "name")]
+    #[serde(skip_serializing)]
+    pub name: Option<String>,
 
-    // #[serde(alias = "id")]
-    // pub id: Option<String>,
+    #[serde(alias = "id")]
+    #[serde(skip_serializing)]
+    pub id: Option<String>,
 
     #[serde(alias = "designation")]
     pub designation: Option<String>,
