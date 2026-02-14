@@ -4,7 +4,6 @@ from jinja2 import Template
 
 
 def __preprocess_data(ship_data, notes):
-
     for variant in ship_data['variants']:
         all_weapon_ids = []
 
@@ -24,12 +23,11 @@ def __preprocess_data(ship_data, notes):
         raw_mods = variant.get('hull_mods', [])
         variant['hull_mods'] = [m for m in raw_mods]
 
-        note = __find_variant_note(ship_data['name'], variant, notes)
+        note = variant.get('notes', '')
+        variant['notes'] = note
 
-        if note:
-            variant['note'] = note
-        else:
-            variant['note'] = ""
+        # if len(note) <= 0: // TODO fix
+        #     variant['notes'] = __find_variant_note(ship_data['name'], variant, notes)
 
     return ship_data
 
@@ -37,11 +35,11 @@ def __find_variant_note(ship_name, variant, notes):
     rules = notes.get(ship_name, [])
 
     if not rules:
-        return None
+        return ""
 
     for rule in rules:
         if rule["variant"] != variant["display_name"]:
-            return None
+            return ""
 
         constraints = rule.get("constraints")
 
@@ -57,7 +55,7 @@ def __find_variant_note(ship_name, variant, notes):
 
         return rule["note"]
 
-    return None
+    return ""
 
 
 def __check_if_collapse(ship_data, collapse_whitelist: list, collapse_limit: int):
@@ -66,7 +64,7 @@ def __check_if_collapse(ship_data, collapse_whitelist: list, collapse_limit: int
     else:
         return True if len(ship_data['variants']) > collapse_limit else False
 
-def create_ship_variant_table(ship_data, notes: dict, template: Template, collapse_whitelist: list, collapse_limit: int):
+def create_ship_variant_table(ship_data, notes: dict, template: Template, collapse_whitelist: list, collapse_limit: int) -> str:
     processed_data = __preprocess_data(ship_data, notes)
     return template.render(
         variants=processed_data['variants'],

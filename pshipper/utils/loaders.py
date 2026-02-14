@@ -22,7 +22,7 @@ def load_variant_notes(name: str) -> dict:
         print(f"Warning: Notes not found at {path}")
         return {}
 
-def load_template(name: str) -> Template:
+def load_template(name: str) -> Template | None:
     template_dir = BASE_DIR / "templates"
 
     file_loader = FileSystemLoader(str(template_dir))

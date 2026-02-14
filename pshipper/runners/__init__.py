@@ -1,1 +1,1 @@
-from .update_variant_tables import sync_variants_to_wiki
+from .variant_tables import sync_variants_to_wiki

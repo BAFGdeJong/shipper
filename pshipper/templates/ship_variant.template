@@ -1,6 +1,6 @@
 {| class="wikitable sortable mw-collapsible{% if collapse == true %} mw-collapsed{% endif %}" style="width:70%;"
 |-
-! colspan="6" | Variants
+! colspan="7" | Variants
 |-
 ! Id
 ! Name
@@ -23,5 +23,5 @@
 {%- for weapon_name, count in variant.consolidated_weapons.items() %}
 * {{ count }}x [[{{ weapon_name }}]]
 {%- endfor %}
-| {{ variant.note }} {% endfor %}
+| {{ variant.notes }} {% endfor %}
 |}
