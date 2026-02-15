@@ -1,8 +1,10 @@
+use crate::io::bool_from_str;
 use serde::{Deserialize, Serialize};
 use crate::io::CSVLoad;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "snake_case", default)]
+#[derive(Default)]
 pub struct ShipSystemData {
     #[serde(alias = "name")]
     pub name: Option<String>,
@@ -49,37 +51,37 @@ pub struct ShipSystemData {
     #[serde(alias = "cooldown")]
     pub cooldown: Option<f64>,
 
-    #[serde(alias = "toggle")]
+    #[serde(alias = "toggle", deserialize_with = "bool_from_str")]
     pub toggle: Option<bool>,
 
-    #[serde(alias = "noDissipation")]
+    #[serde(alias = "noDissipation", deserialize_with = "bool_from_str")]
     pub no_dissipation: Option<bool>,
 
-    #[serde(alias = "noHardDissipation")]
+    #[serde(alias = "noHardDissipation", deserialize_with = "bool_from_str")]
     pub no_hard_dissipation: Option<bool>,
 
-    #[serde(alias = "hardFlux")]
+    #[serde(alias = "hardFlux", deserialize_with = "bool_from_str")]
     pub hard_flux: Option<bool>,
 
-    #[serde(alias = "noFiring")]
+    #[serde(alias = "noFiring", deserialize_with = "bool_from_str")]
     pub no_firing: Option<bool>,
 
-    #[serde(alias = "noTurning")]
+    #[serde(alias = "noTurning", deserialize_with = "bool_from_str")]
     pub no_turning: Option<bool>,
 
-    #[serde(alias = "noStrafing")]
+    #[serde(alias = "noStrafing", deserialize_with = "bool_from_str")]
     pub no_strafing: Option<bool>,
 
-    #[serde(alias = "noAccel")]
+    #[serde(alias = "noAccel", deserialize_with = "bool_from_str")]
     pub no_accel: Option<bool>,
 
-    #[serde(alias = "noShield")]
+    #[serde(alias = "noShield", deserialize_with = "bool_from_str")]
     pub no_shield: Option<bool>,
 
-    #[serde(alias = "noVent")]
+    #[serde(alias = "noVent", deserialize_with = "bool_from_str")]
     pub no_vent: Option<bool>,
 
-    #[serde(alias = "isPhaseCloak")]
+    #[serde(alias = "isPhaseCloak", deserialize_with = "bool_from_str")]
     pub is_phase_cloak: Option<bool>,
 
     #[serde(alias = "tags")]

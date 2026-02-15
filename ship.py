@@ -35,6 +35,14 @@ def view_hull_mod(
     cmd.view_hull_mod(starsector_data_dir, hull_mod, key_by)
 
 @app.command()
+def view_ship_system(
+        starsector_data_dir: str = typer.Option(..., "-d", "--data"),
+        system: str = typer.Option(..., "-m", "--hull-mod"),
+        key_by: str = typer.Option("name", "-kb", "--key-by")
+):
+    cmd.view_ship_system(starsector_data_dir, system, key_by)
+
+@app.command()
 def validate_wiki_ship_info(
         starsector_data_dir: str = typer.Option(..., "-d", "--data"),
         ships: str = typer.Option(..., "-s", "--ships"),

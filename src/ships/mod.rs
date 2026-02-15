@@ -52,7 +52,11 @@ impl Data {
 
     pub fn get_hullmods(&self, key_by: &str) -> Result<HashMap<String, HullModData>, Box<dyn Error>> {
         HullModData::load_as_map(&format!("{}hull_mods.csv", &self.hull_mods_folder), &key_by)
-    } // TODO move function to own class
+    }
+
+    pub fn get_ship_systems(&self, key_by: &str) -> Result<HashMap<String, ShipSystemData>, Box<dyn Error>> {
+        ShipSystemData::load_as_map(&format!("{}ship_systems.csv", &self.ship_systems_folder), &key_by)
+    }
 
     fn map(&mut self, key_type: &str) -> HashMap<String, Ship> {
         let ship_data = ShipData::load_as_map(&format!("{}ship_data.csv", &self.hulls_folder), "id");
