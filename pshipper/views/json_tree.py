@@ -34,7 +34,7 @@ def add_to_tree(tree: Tree, data):
         tree.add(str(data))
 
 
-def json_tree(data: dict, title: str = "Ship Data"):
+def json_tree(data: dict, title: str = "Json"):
     """
     Renders JSON as a Tree.
     """
