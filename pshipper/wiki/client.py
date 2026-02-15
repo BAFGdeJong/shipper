@@ -3,7 +3,7 @@ import re
 from mwcleric import WikiClient, AuthCredentials
 from pshipper.formatter import create_ship_variant_table
 
-class Editor:
+class Client:
     def __init__(self, username, password):
         credentials = AuthCredentials(username=username, password=password, user_file=None)
         client = WikiClient('https://starsector.wiki.gg', credentials=credentials)
@@ -45,7 +45,7 @@ class Editor:
             for wiki_variant in wiki_data:
                 notes = wiki_variant.get('Notes', False)
                 if notes:
-                    v_id = wiki_variant.get('Id', False)
+                    v_id = wiki_variant.get('ID', False)
                     name = wiki_variant.get('Name', False)
                     if v_id:
                         variants = ship['variants']
@@ -69,7 +69,7 @@ class Editor:
                 new_table = create_ship_variant_table(ship, notes, template, collapse_whitelist, collapse_after_amount)
                 new_text = pattern.sub(f"\\1\n{new_table}\n", current_text)
 
-                page.save(new_text, summary=f"Added variants")
+                page.save(new_text, summary=f"Added variants", minor=True)
             else:
                 print(f"  Skipping {page_name}: Variants section already contains data.")
         else:
@@ -98,7 +98,7 @@ class Editor:
             for wiki_variant in wiki_data:
                 notes = wiki_variant.get('Notes', False)
                 if notes:
-                    v_id = wiki_variant.get('Id', False)
+                    v_id = wiki_variant.get('ID', False)
                     name = wiki_variant.get('Name', False)
                     if v_id:
                         variants = ship['variants']
@@ -162,9 +162,9 @@ class Editor:
             variants.append(result)
 
         for variant in variants:
-            v_id = variant.get('Id', False)
+            v_id = variant.get('ID', False)
             if v_id:
-                variant['Id'] = v_id.lstrip('| ')
+                variant['ID'] = v_id.lstrip('| ')
 
             name = variant.get('Name', False)
             if name:
@@ -185,7 +185,7 @@ class Editor:
                 matches = re.findall(r'\[\[(.*?)]]', hull_mods)
                 variant['Hullmods'] = matches
 
-            weapons = variant.get('Weapons & Fighters', False)
+            weapons = variant.get('Armaments', False)
             if weapons:
                 expanded_list = []
                 pattern = re.compile(r'(\d+)x\s*\[\[(.*?)]]')
@@ -197,6 +197,6 @@ class Editor:
                         name = match.group(2)
                         expanded_list.extend([name] * count)
 
-                variant['Weapons & Fighters'] = expanded_list
+                variant['Armaments'] = expanded_list
 
         return variants

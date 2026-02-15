@@ -50,7 +50,7 @@ pub struct Variant {
 }
 
 impl ParsePlan<(&HashMap<String, String>, &HashMap<String, String>)> for Variant {
-    fn from_value(json: &Value, ctx: &(&HashMap<String, String>, &HashMap<String, String>)) -> Option<Self> {
+    fn plan(json: &Value, ctx: &(&HashMap<String, String>, &HashMap<String, String>)) -> Option<Self> {
         let (hull_mods_map, weapons_map) = ctx;
 
         Some(Variant::new(
@@ -191,7 +191,7 @@ mod tests {
             ]
         });
 
-        let variant = Variant::from_value(&json_input, &ctx)
+        let variant = Variant::plan(&json_input, &ctx)
             .expect("Failed to parse Astral Elite variant");
 
 

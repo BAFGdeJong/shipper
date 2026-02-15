@@ -1,10 +1,6 @@
-use std::collections::HashMap;
 use std::error::Error;
-use std::fs::File;
-use std::io;
-use std::path::Path;
 use serde::{Deserialize, Serialize};
-
+use crate::io::CSVLoad;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -181,114 +177,18 @@ pub struct ShipData {
     #[serde(alias = "number")]
     pub number: Option<f64>,
 
-} impl ShipData {
-    pub fn load<P: AsRef<Path>>(path: P) -> Result<Vec<Self>, Box<dyn Error>> {
-        let file = File::open(path)?;
-
-        let mut rdr = csv::ReaderBuilder::new()
-            .has_headers(true) // Line 1 is headers
-            .from_reader(file);
-
-        let mut ships = Vec::new();
-
-        for result in rdr.deserialize() {
-            match result {
-                Ok(record) => {
-                    ships.push(record);
-                }
-                Err(e) => {
-                    eprintln!("Skipping invalid row: {}", e);
-                }
-            }
-        }
-
-        Ok(ships)
-    }
-
-    pub fn load_as_map<P: AsRef<Path>>(path: P, key_field: &str) -> Result<HashMap<String, Self>, Box<dyn Error>> {
-        match Self::load(path) {
-            Ok(vec) => {
-                let mut ship_map = HashMap::new();
-                for ship in vec {
-                    let map_key = match key_field {
-                        "id" => ship.id.clone(),
-                        "name" => ship.name.clone(),
-                        _ => {
-                            return Err(Box::new(io::Error::new(
-                                io::ErrorKind::InvalidInput,
-                                format!("Field '{}' is not supported as a map key", key_field)
-                            )));
-                        }
-                    };
-
-                    if let Some(k) = map_key {
-                        ship_map.insert(k, ship);
-                    }
-
-                }
-                Ok(ship_map)
-            },
-            Err(e) => {
-                Err(e)
-            }
-        }
-    }
-
+}
+impl ShipData {
     fn to_json(&self) -> serde_json::Result<String> {
         serde_json::ser::to_string_pretty(&self)
     }
-
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_loading_csv() {
-        // match ShipData::load("D:/NonSteamLibrary/Starsector/starsector-core/data/hulls/ship_data.csv") {
-        //     Ok(ships) => {
-        //         println!("{}", serde_json::ser::to_string_pretty(&ships).unwrap());
-        //     }
-        //     Err(e) => {
-        //         eprintln!("Skipping invalid row: {}", e);
-        //     }
-        // }
-
-        match ShipData::load_as_map("D:/NonSteamLibrary/Starsector/starsector-core/data/hulls/ship_data.csv", "id") {
-            Ok(ships) => {
-                // println!("{}", serde_json::ser::to_string_pretty(ships.get("warthog").unwrap()).unwrap());
-                println!("{}", ships.get("warthog").unwrap().to_json().unwrap());
-            }
-            Err(_) => {
-
-            }
+impl CSVLoad for ShipData {
+    fn get_field(&self, key: &str) -> Option<String> {
+        match key {
+            "name" => Some(self.name.clone()?),
+            "id" => Some(self.id.clone()?),
+            _ => None
         }
-
-        // match ShipData::load("D:/NonSteamLibrary/Starsector/starsector-core/data/hulls/ship_data.csv") {
-        //     Ok(ships) => {
-        //         for ship in ships {
-        //             if let Some(name) = ship.name {
-        //                 println!("Ship name: {}", name);
-        //             }
-        //         }
-        //     }
-        //     Err(e) => {
-        //         eprintln!("Critical error: {}", e);
-        //     }
-        // }
-
-        // match ShipData::load("D:/NonSteamLibrary/Starsector/starsector-core/data/hulls/ship_data.csv") { // TODO don't hardcode
-        //     Ok(ships) => {
-        //         for ship in ships {
-        //             if let Some(pts) = ship.fleet_pts {
-        //                 println!("Loaded: {:?} ({} pts)", ship.name, pts);
-        //             } else {
-        //                 println!("Loaded: {:?} (Drone/Module - No points)", ship.name);
-        //             }
-        //         }
-        //     },
-        //     Err(e) => eprintln!("Critical Error: {}", e),
-        // }
     }
 }

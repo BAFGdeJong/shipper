@@ -2,24 +2,45 @@ use std::collections::HashMap;
 use serde::Serialize;
 use serde_json::Value;
 use crate::io::ParsePlan;
+use crate::ships::description::Description;
+use crate::ships::hull_mod::HullModData;
 use crate::ships::ship_data::ShipData;
+use crate::ships::ship_system::{ShipSystemData};
 use crate::ships::variant::Variant;
+use crate::ships::weapon_slot::WeaponSlot;
 
 #[derive(Serialize, Debug)]
 pub struct Ship {
     pub hull_id: String,
     pub skin_id: String,
     pub name: String,
+    pub hull_size: String,
+    pub weapon_slots: Vec<WeaponSlot>,
+    pub system: Option<ShipSystemData>,
+    pub hull_mods: Vec<Option<HullModData>>,
 
     #[serde(flatten)]
     pub data: Option<ShipData>,
+
+    pub description: Option<Description>,
 
     pub variants: Vec<Variant>
 }
 
 impl Ship {
-    pub fn new(hull_id: String, skin_id: String, name: String, data: Option<ShipData>, variants: Vec<Variant>) -> Self {
-        Self { hull_id, skin_id, name, data, variants }
+    pub fn new(
+        hull_id: String,
+        skin_id: String,
+        name: String,
+        hull_size: String,
+        weapon_slots: Vec<WeaponSlot>,
+        system: Option<ShipSystemData>,
+        hull_mods: Vec<Option<HullModData>>,
+        data: Option<ShipData>,
+        description: Option<Description>,
+        variants: Vec<Variant>
+    ) -> Self {
+        Self { hull_id, skin_id, name, hull_size, weapon_slots, system, hull_mods, data, description, variants }
     }
 
     pub fn add_variant(&mut self, variant: Variant) {
@@ -28,9 +49,12 @@ impl Ship {
 }
 
 type ShipStatsMap = HashMap<String, ShipData>;
-impl ParsePlan<ShipStatsMap> for Ship {
+type DescriptionsMap = HashMap<String, Description>;
+type ShipSystemsMap = HashMap<String, ShipSystemData>;
+type HullModMap = HashMap<String, HullModData>;
+impl<'a> ParsePlan<(&'a ShipStatsMap, &'a DescriptionsMap, &'a ShipSystemsMap, &'a HullModMap)> for Ship {
 
-    fn from_value(json: &Value, ctx: &ShipStatsMap) -> Option<Self> {
+    fn plan(json: &Value, ctx: &(&ShipStatsMap, &DescriptionsMap, &ShipSystemsMap, &HullModMap)) -> Option<Self> {
         let hull_id = json["hullId"].as_str()
             .or_else(|| json["baseHullId"].as_str())
             .unwrap_or("")
@@ -42,16 +66,60 @@ impl ParsePlan<ShipStatsMap> for Ship {
             .to_string();
 
         let name = json["hullName"].as_str().unwrap_or("").to_string();
-        let stats = ctx.get(&hull_id).cloned(); // TODO remove clone
+
+        let hull_size = json["hullSize"].as_str().unwrap_or("").to_string();
+
+        let weapon_slots: Vec<WeaponSlot> = json["weaponSlots"]
+            .as_array()
+            .unwrap_or(&vec![])
+            .iter()
+            .map(|e|
+                WeaponSlot::new(
+                    e["angle"].as_i64(),
+                    e["arc"].as_i64(),
+                    e["id"].as_str().unwrap_or("").to_string(),
+                    serde_json::from_value(e["locations"].clone()).unwrap_or(None),
+                    e["mount"].as_str().unwrap_or("").to_string(),
+                    e["size"].as_str().unwrap_or("").to_string(),
+                    e["type"].as_str().unwrap_or("").to_string()
+                )
+            ).collect();
+
+        let stats = ctx.0.get(&hull_id).cloned(); // TODO remove clone
+        let description = ctx.1.get(&hull_id).cloned();
+
+        let system_id = stats.as_ref()
+            .and_then(|s| s.system_id.clone())
+            .unwrap_or_default();
+
+        let systems = ctx.2.get(&system_id).cloned();
+
+        let mut hull_mods: Vec<Option<HullModData>> = vec![];
+
+        let built_in_mods = json["builtInMods"].as_array();
+
+        if let Some(mods_array) = built_in_mods {
+            for e in mods_array {
+                if let Some(mod_id) = e.as_str() {
+                    hull_mods.push(ctx.3.get(mod_id).cloned());
+                }
+            }
+        }
 
         Some(Ship::new(
             hull_id,
             skin_id,
             name,
+            hull_size,
+            weapon_slots,
+            systems,
+            hull_mods,
             stats,
+            description,
             vec![]
         ))
     }
+
 }
 
 // #[cfg(test)]
