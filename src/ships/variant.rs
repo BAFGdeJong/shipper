@@ -11,6 +11,7 @@ pub struct Variant {
     pub display_name: String,
     pub hull_id: String,
     pub variant_id: String,
+    pub goal_variant: bool,
     pub flux_capacitors: i64,
     pub flux_vents: i64,
     pub hull_mods: Vec<String>,
@@ -23,6 +24,7 @@ pub struct Variant {
         display_name: String,
         hull_id: String,
         variant_id: String,
+        goal_variant: bool,
         flux_capacitors: i64,
         flux_vents: i64,
         hull_mods: Vec<String>,
@@ -35,6 +37,7 @@ pub struct Variant {
             display_name,
             hull_id,
             variant_id,
+            goal_variant,
             flux_capacitors,
             flux_vents,
             hull_mods,
@@ -47,13 +50,14 @@ pub struct Variant {
 }
 
 impl ParsePlan<(&HashMap<String, String>, &HashMap<String, String>)> for Variant {
-    fn from_value(json: &Value, ctx: &(&HashMap<String, String>, &HashMap<String, String>)) -> Option<Self> {
+    fn plan(json: &Value, ctx: &(&HashMap<String, String>, &HashMap<String, String>)) -> Option<Self> {
         let (hull_mods_map, weapons_map) = ctx;
 
         Some(Variant::new(
             json["displayName"].as_str().unwrap_or("Unknown").to_string(),
             json["hullId"].as_str().unwrap_or("").to_string(),
             json["variantId"].as_str().unwrap_or("").to_string(),
+            json["goalVariant"].as_bool().unwrap_or(false),
             json["fluxCapacitors"].as_i64().unwrap_or(0),
             json["fluxVents"].as_i64().unwrap_or(0),
 
@@ -187,7 +191,7 @@ mod tests {
             ]
         });
 
-        let variant = Variant::from_value(&json_input, &ctx)
+        let variant = Variant::plan(&json_input, &ctx)
             .expect("Failed to parse Astral Elite variant");
 
 

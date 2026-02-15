@@ -5,13 +5,13 @@ from pathlib import Path
 from typing import Dict, List
 from tqdm import tqdm
 
-from pshipper.editors.editor import Editor
+from pshipper.wiki.client import Client
 from pshipper.utils import fix_d_variants
 
 logger = logging.getLogger(__name__)
 
 def sync_variants_to_wiki(
-        editor: Editor,
+        editor: Client,
         starsector_data_folder: Path,
         update_ships: List[str],
         ship_whitelist: List[str],
