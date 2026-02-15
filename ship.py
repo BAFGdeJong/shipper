@@ -29,18 +29,20 @@ def view_ship(
 @app.command()
 def view_hull_mod(
         starsector_data_dir: str = typer.Option(..., "-d", "--data"),
-        hull_mod: str = typer.Option(..., "-m", "--hull-mod"),
-        key_by: str = typer.Option("name", "-kb", "--key-by")
+        hull_mod: str = typer.Option(None, "-m", "--hull-mod"),
+        key_by: str = typer.Option("name", "-kb", "--key-by"),
+        random: bool = typer.Option(False, "-r", "--random"),
 ):
-    cmd.view_hull_mod(starsector_data_dir, hull_mod, key_by)
+    cmd.view_hull_mod(starsector_data_dir, hull_mod, key_by, random if hull_mod is None else False)
 
 @app.command()
 def view_ship_system(
         starsector_data_dir: str = typer.Option(..., "-d", "--data"),
-        system: str = typer.Option(..., "-m", "--hull-mod"),
-        key_by: str = typer.Option("name", "-kb", "--key-by")
+        system: str = typer.Option(None, "-m", "--hull-mod"),
+        key_by: str = typer.Option("name", "-kb", "--key-by"),
+        random: bool = typer.Option(False, "-r", "--random"),
 ):
-    cmd.view_ship_system(starsector_data_dir, system, key_by)
+    cmd.view_ship_system(starsector_data_dir, system, key_by, random if system is None else False)
 
 @app.command()
 def validate_wiki_ship_info(
