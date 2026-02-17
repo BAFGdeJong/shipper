@@ -50,6 +50,10 @@ impl Data {
         self.map(key_by)
     }
 
+    pub fn get_ships_minimal(&self, key_by: &str) -> Result<HashMap<String, ShipData>, Box<dyn Error>> {
+        ShipData::load_as_map(&format!("{}ship_data.csv", &self.hulls_folder), &key_by)
+    }
+
     pub fn get_hullmods(&self, key_by: &str) -> Result<HashMap<String, HullModData>, Box<dyn Error>> {
         HullModData::load_as_map(&format!("{}hull_mods.csv", &self.hull_mods_folder), &key_by)
     }
@@ -125,22 +129,22 @@ impl Data {
             }
         }
 
-        let mut shipsMap = HashMap::new();
+        let mut ships_map = HashMap::new();
 
         match key_type {
             "name" => {
-                for ship in ships { shipsMap.insert(ship.name.clone(), ship); }
+                for ship in ships { ships_map.insert(ship.name.clone(), ship); }
             }
             "hull_id" => {
-                for ship in ships { shipsMap.insert(ship.hull_id.clone(), ship); }
+                for ship in ships { ships_map.insert(ship.hull_id.clone(), ship); }
             }
             "skin_id" => {
-                for ship in ships { shipsMap.insert(ship.skin_id.clone(), ship); }
+                for ship in ships { ships_map.insert(ship.skin_id.clone(), ship); }
             }
             _ => {}
         }
 
-        shipsMap
+        ships_map
     }
 
     fn load_csv(csv: &str) -> Result<HashMap<String, String>, Box<dyn Error>> {

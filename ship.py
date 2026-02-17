@@ -1,6 +1,10 @@
+import shipper
+
 import pshipper.commands as cmd
 
 import typer
+
+from pshipper.views.json_tree import json_tree
 
 app = typer.Typer()
 
@@ -25,6 +29,14 @@ def view_ship(
         key_by: str = typer.Option("name", "-kb", "--key-by")
 ):
     cmd.view_ship(starsector_data_dir, ship, key_by)
+
+@app.command()
+def view_ship_minimal(
+        starsector_data_dir: str = typer.Option(..., "-d", "--data"),
+        ship: str = typer.Option(..., "-s", "--ships"),
+        key_by: str = typer.Option("name", "-kb", "--key-by")
+):
+    print(json_tree(shipper.get_ships_minimal(starsector_data_dir, key_by).get(ship)))
 
 @app.command()
 def view_hull_mod(

@@ -74,9 +74,9 @@ def convert_to_wiki_ship_format(ship):
 
     weapon_mounts = [ShipMount.from_game_data(x) for x in ship.get('weapon_slots')]
 
-    # fighter_bays = sum(2 if m.size == "LARGE" else 1 for m in weapon_mounts if m.type_ == 'LAUNCH_BAY')
-    fighter_bays = sum(1 for m in weapon_mounts if m.type_ == 'LAUNCH_BAY') # TODO, is not correct
-    new_ship.update({'FighterBays': fighter_bays}) if fighter_bays > 0 else None
+    fb = ship.get('fighter_bays', None)
+    if fb:
+        new_ship.update({'FighterBays': fb})
 
     weapon_mounts = [x.to_dict() for x in ShipMount.consolidate_mounts(weapon_mounts) if
                      ((x.mount_type == "TURRET" or x.mount_type == "HARDPOINT") and x.type_ != "DECORATIVE")]

@@ -40,7 +40,6 @@ pub struct ShipData {
     #[serde(alias = "max flux")]
     pub max_flux: Option<f64>,
 
-    // This will now appear in Python as "flux_capacity_tiers"
     #[serde(alias = "8/6/5/4%")]
     pub flux_capacity_tiers: Option<f64>,
 
